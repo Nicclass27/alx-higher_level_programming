@@ -9,4 +9,3 @@ print(f"Middle word: {middle_word}")
 © 2022 GitHub, Inc.
 Terms
 Priv
-
