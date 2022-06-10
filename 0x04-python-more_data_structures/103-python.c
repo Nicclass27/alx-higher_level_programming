@@ -1,32 +1,69 @@
-import ctypes
+#include <Python.h>
+#include <stdio.h>
 
-lib = ctypes.CDLL('./libPython.so')
-lib.print_python_list.argtypes = [ctypes.py_object]
-lib.print_python_bytes.argtypes = [ctypes.py_object]
-s = b"Hello"
-lib.print_python_bytes(s);
-b = b'\xff\xf8\x00\x00\x00\x00\x00\x00';
-lib.print_python_bytes(b);
-b = b'What does the \'b\' character do in front of a string literal?';
-lib.print_python_bytes(b);
-l = [b'Hello', b'World']
-lib.print_python_list(l)
-del l[1]
-lib.print_python_list(l)
-l = l + [4, 5, 6.0, (9, 8), [9, 8, 1024], b"Holberton", "Betty"]
-lib.print_python_list(l)
-l = []
-lib.print_python_list(l)
-l.append(0)
-lib.print_python_list(l)
-l.append(1)
-l.append(2)
-l.append(3)
-l.append(4)
-lib.print_python_list(l)
-l.pop()
-lib.print_python_list(l)
-l = ["Holberton"]
-lib.print_python_list(l)
-lib.print_python_bytes(l);
+void print_python_bytes(PyObject *p);
+
+/**
+* print_python_list - print info about the python
+* Object
+*
+* @p: The python object
+*/
+void print_python_list(PyObject *p)
+{
+	Py_ssize_t size = 0, i, alloc;
+
+	if (PyList_CheckExact(p))
+	{
+		size = ((PyVarObject *)p)->ob_size;
+		alloc = ((PyListObject *)p)->allocated;
+
+		printf("[*] Python list info\n");
+		printf("[*] Size of the Python List = %lu\n", size);
+		printf("[*] Allocated = %lu\n", alloc);
+
+		for (i = 0; i < size; i++)
+		{
+			printf("Element %ld: %s\n", i, ((PyListObject *)p)->ob_item[i]->ob_type->tp_name);
+			if (strcmp(((PyListObject *)p)->ob_item[i]->ob_type->tp_name, "bytes") == 0)
+			{
+				print_python_bytes(((PyListObject *)p)->ob_item[i]);
+			}
+		}
+	}
+}
+
+/**
+* print_python_bytes - Print info about the bytes content of a list
+*
+* @p: The item of type bytes
+*
+* Return: Anything, cause void function
+*/
+void print_python_bytes(PyObject *p)
+{
+	int size, i;
+
+	printf("[.] bytes object info\n");
+	if (strcmp(p->ob_type->tp_name, "bytes") != 0)
+	{
+		printf("  [ERROR] Invalid Bytes Object\n");
+		return;
+	}
+	size = ((PyVarObject *)p)->ob_size;
+	printf("  size: %d\n", size);
+	printf("  trying string: %s\n", ((PyBytesObject *)p)->ob_sval);
+
+	size > 10 ? size = 10 : size++;
+
+	printf("  first %d bytes: ", size);
+	for (i = 0; i < size; i++)
+	{
+		printf("%02hhx", ((PyBytesObject *)p)->ob_sval[i]);
+		if (i > size - 2)
+			printf("\n");
+		else
+			printf(" ");
+	}
+}
 
