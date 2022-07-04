@@ -1,15 +1,11 @@
 #!/usr/bin/python3
-
 """
-Create an empty class of rectangle
+an empty class Rectangle that defines a rectangle
 """
 
 
 class Rectangle:
     """
-    Create a new rectangle
-    Args: No args
-    Raises: No raises
-    Returns: No returns
+    defines a rectangle
     """
     pass
